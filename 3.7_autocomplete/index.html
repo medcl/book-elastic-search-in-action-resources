@@ -19,7 +19,7 @@
  	}
 
  	.tt-dataset{
- 		color: white;
+ 		background: #AF85BF;
  	}
 
  	.tt-suggestion{
@@ -35,7 +35,7 @@
  	}
 
  	.tt-empty{
- 		background: black;
+ 		background: green;
  	}
 
  </style>
@@ -96,7 +96,9 @@ $('#demo .typeahead').typeahead({
   name: 'suggestions',
   source: substringMatcher(suggestions),
   "templates":{
-  	"notFound":function(context){ return "<span class=tt-empty>Nothing Found!</span>" }
+  	"notFound":function(context){ return "<span class=tt-empty>Nothing Found!</span>" },
+  	"header":"<span style=font-size:12px;>My suggestion:</span>",
+  	"footer":"<span style=font-size:10px;>Copyright 2018 &copy;</span>"
   }
 });
 
