@@ -8,9 +8,44 @@
   </head>
   <body>
  
+ <style type="text/css">
+ 	
+ 	.tt-hint{
+ 		color: yellow;
+ 	}
+
+ 	.tt-menu{
+ 		border: 1px solid red;
+ 	}
+
+ 	.tt-dataset{
+ 		color: blue;
+ 	}
+
+ 	.tt-suggestion{
+ 		background: brown;
+ 	}
+
+ 	.tt-cursor{
+ 		background: white;
+ 	}
+
+ 	.tt-highlight{
+ 		color: yellow;
+ 	}
+
+ </style>
+
  <div id="demo">
   <input class="typeahead" type="text" placeholder="请输入关键字">
  </div>
+
+
+<hr/>
+ 
+ <a href="#" onclick="var myVal= 'your keyword'; $('.typeahead').typeahead('val', myVal); return false;">动态设置值</a>
+
+
 
 <script src="jquery.js"></script>
 <script src="typeahead.bundle.min.js"></script>
@@ -50,7 +85,8 @@ var suggestions = ['Elastic', 'Elasticsearch', 'Kibana', 'Logstash', 'Beats', 'E
 $('#demo .typeahead').typeahead({
   hint: true,
   highlight: true,
-  minLength: 1
+  minLength: 1,
+  autoselect: true
 },
 {
   name: 'suggestions',
