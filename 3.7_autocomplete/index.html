@@ -34,13 +34,17 @@
  		color: red;
  	}
 
+ 	.tt-empty{
+ 		background: black;
+ 	}
+
  </style>
 
  <div id="demo">
   <input class="typeahead" type="text" placeholder="请输入关键字">
  </div>
 
-
+<br><br><br><br>
 <hr/>
  
  <a href="#" onclick="var myVal= 'your keyword'; $('.typeahead').typeahead('val', myVal); return false;">动态设置值</a>
@@ -90,7 +94,10 @@ $('#demo .typeahead').typeahead({
 },
 {
   name: 'suggestions',
-  source: substringMatcher(suggestions)
+  source: substringMatcher(suggestions),
+  "templates":{
+  	"notFound":function(context){ return "<span class=tt-empty>Nothing Found!</span>" }
+  }
 });
 
 </script>
