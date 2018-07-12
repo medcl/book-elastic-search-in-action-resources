@@ -50,12 +50,12 @@
 
 <script type="text/javascript">
 
-//定义一个 Prefech 的 Bloodhound 实例，数据来源为一个 json 文件
+//结合 prefech 和 remote 的使用
  var topSearch = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('keyword'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         prefetch: 'top_search.json',
-        remote: 'source.json'
+        remote: 'remote.json'
 });
 
 
