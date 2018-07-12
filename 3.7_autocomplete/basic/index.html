@@ -96,9 +96,11 @@ $('#demo .typeahead').typeahead({
   name: 'suggestions',
   source: substringMatcher(suggestions),
   "templates":{
-  	"notFound":function(context){ return "<span class=tt-empty>Nothing Found!</span>" },
+  	"notFound":function(context){ return "<span class=tt-empty>Nothing Found for query: "+context.query+"!</span>" },
   	"header":"<span style=font-size:12px;>My suggestion:</span>",
-  	"footer":"<span style=font-size:10px;>Copyright 2018 &copy;</span>"
+  	"footer":"<span style=font-size:10px;>Copyright 2018 &copy;</span>",
+  	"suggestion":function(context){ return "<div>"+context+"!</div>" },
+
   }
 });
 
