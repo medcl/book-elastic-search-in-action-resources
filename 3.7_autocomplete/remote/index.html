@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+ 
+ <style type="text/css">
+ 	
+ 	.tt-hint{
+ 		color: yellow;
+ 	}
+
+ 	.tt-menu{
+ 		border: 1px solid blue;
+ 	}
+
+ 	.tt-dataset{
+ 		background: #AF85BF;
+ 	}
+
+ 	.tt-suggestion{
+ 		background: #cccccc;
+ 	}
+
+ 	.tt-cursor{
+ 		background: gray;
+ 	}
+
+ 	.tt-highlight{
+ 		color: red;
+ 	}
+
+ 	.tt-empty{
+ 		background: green;
+ 	}
+
+ </style>
+
+ <div id="demo">
+  <input class="typeahead" type="text" placeholder="请输入关键字">
+ </div>
+
+
+<script src="jquery.js"></script>
+<script src="typeahead.bundle.min.js"></script>
+
+<script type="text/javascript">
+
+//定义一个 Prefech 的 Bloodhound 实例，数据来源为一个 json 文件
+ var topSearch = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('keyword'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        prefetch: 'top_search.json',
+        remote: 'source.json'
+});
+
+
+//绑定 #demo 对象，赋予 typeahead 的搜索提示行为
+$('#demo .typeahead').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1,
+  autoselect: false
+},
+{
+  name: 'topSearch',
+  displayKey: 'keyword',
+  source: topSearch,
+  "templates":{
+  	"notFound":function(context){ return "<span class=tt-empty>Nothing Found for query: "+context.query+"!</span>" },
+  	"header":"<span style=font-size:12px;>My suggestion:</span>",
+  	"footer":"<span style=font-size:10px;>Copyright 2018 &copy;</span>",
+  	"suggestion":function(context){ return "<div>"+context.keyword+"!<br/><span style='font-size=2px'><a href="+context.url+" >"+context.url+"</a></span></div>" },
+
+  }
+});
+
+</script>
+
+  </body>
+</html>
