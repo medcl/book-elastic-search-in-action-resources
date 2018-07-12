@@ -39,7 +39,7 @@
  	}
 
  </style>
-
+请以网站方式打开：
  <div id="demo">
   <input class="typeahead" type="text" placeholder="请输入关键字">
  </div>
@@ -74,7 +74,7 @@ $('#demo .typeahead').typeahead({
   	"notFound":function(context){ return "<span class=tt-empty>Nothing Found for query: "+context.query+"!</span>" },
   	"header":"<span style=font-size:12px;>My suggestion:</span>",
   	"footer":"<span style=font-size:10px;>Copyright 2018 &copy;</span>",
-  	"suggestion":function(context){ return "<div>"+context.keyword+"!<br/><span style='font-size=2px'><a href="+context.url+" >"+context.url+"</a></span></div>" },
+                "suggestion":function(context){ return '<div>'+context.keyword+'!<br/><span style=font-size=2px><a href=""'+context["url"]+'" >'+context.url+'</a></span></div>' },
 
   }
 });
