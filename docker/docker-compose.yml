@@ -1,0 +1,39 @@
+version: '2.0'
+services:
+ elasticsearch-in-action-book:
+   image: docker.elastic.co/elasticsearch/elasticsearch:6.5.2
+   container_name: elasticsearch-in-action-book
+   environment:
+     - cluster.name=docker-cluster
+     - xpack.security.enabled=false
+     - bootstrap.memory_lock=true
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - "discovery.zen.ping.unicast.hosts=elasticsearch1,elasticsearch2,elasticsearch3"
+   ulimits:
+     nproc: 65535
+     memlock:
+       soft: -1
+       hard: -1
+   volumes:
+     - elasticsearch-in-action-book:/usr/share/elasticsearch/data
+   ports:
+     - 9200:9200
+   networks:
+     - esnet
+ kibana:
+   image: docker.elastic.co/kibana/kibana:6.5.2
+   ports: ['5601:5601']
+   networks: ['esnet']
+   environment:
+    - SERVER_NAME=kibana.localhost
+    - ELASTICSEARCH_URL=http://elasticsearch-in-action-book:9200
+    - ELASTICSEARCH_USERNAME=elastic
+    - ELASTICSEARCH_HOST=elasticsearch2
+    - ELASTICSEARCH_PORT=9200
+    - ELASTIC_PWD=changeme
+    - KIBANA_PWD=changeme
+volumes:
+ elasticsearch-in-action-book:
+   driver: local
+networks:
+  esnet: 
