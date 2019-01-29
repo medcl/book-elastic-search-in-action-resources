@@ -1,0 +1,121 @@
+<!-- 新的搜索框 -->
+
+			<style type="text/css">
+
+				#search_box input{
+					padding: 10px;
+				}
+				
+				#search_box .tt-menu{
+					width: 500px;;
+					background: black;
+				}
+				.tt-hint{
+					color: #CCCCCC;
+				}
+
+				.tt-menu{
+					border-bottom: 1px solid #6badc8;
+				}
+
+				.tt-dataset{
+					background: #FFFFFF;
+				}
+
+				.tt-selectable{
+					padding:5px 10px ;
+				}
+
+				.tt-suggestion{
+					border-top: 1px dotted #ebf0f1;
+					border-left: 1px solid #ebf0f1;
+					border-right: 1px solid #ebf0f1;
+				}
+
+				.tt-cursor{
+					background: #e2f3fa;
+				}
+
+				.tt-highlight{
+					color: #ff8b70;
+				}
+
+				.tt-link{
+					font-size:2px;
+				}
+				.tt-link a{
+					font-size:2px;
+					text-decoration: underline;
+				}
+
+				.tt-empty{
+					padding:5px 10px ;
+				}
+
+				.tt-query-not-found{
+					color: #ff606a;
+				}
+
+				.tt-header{
+					padding:5px 10px ;
+					font-size:14px;
+					width: 100%;
+					background: #d9eaf1;
+					color: #2c3134;
+					display: block;
+				}
+
+				.tt-footer{
+					width: 100%;
+					background: #d9eaf1;
+					display: block;
+					padding-right: 10px;
+					text-align: right;
+					font-size:10px;
+				}
+
+			</style>
+
+			<div id="search_box">
+				<input class="typeahead" type="text" placeholder="请输入关键字">
+			</div>
+
+			<script type="text/javascript" src="<?php echo G_STATIC_URL; ?>/js/typeahead.bundle.min.js"></script>
+			<script type="text/javascript">
+
+				//结合 prefech 和 remote 的使用
+				var topSearch = new Bloodhound({
+					datumTokenizer: Bloodhound.tokenizers.obj.whitespace('keyword'),
+					queryTokenizer: Bloodhound.tokenizers.whitespace,
+					prefetch: 'top_search.json',
+					remote:   {
+						url: '/search/ajax/suggest/?q=%QUERY',
+						wildcard: '%QUERY'
+					}
+				});
+
+
+				//绑定对象，赋予 typeahead 的搜索提示行为
+				$('#search_box .typeahead').typeahead({
+							hint: true,
+							highlight: true,
+							minLength: 1,
+							autoselect: false
+						},
+						{
+							name: 'topSearch',
+							displayKey: 'keyword',
+							source: topSearch,
+							limit:10,
+							"templates":{
+								"notFound":function(context){ return "<div class=tt-empty>Nothing found for:&nbsp; <span class='tt-query-not-found'>"+context.query+"</span></div>" },
+								"header":"<div class='tt-header'><span>Suggestions:</span></div>",
+								"footer":"<div class='tt-footer'><span>Search by Elastic</span></div>",
+								"suggestion":function(context){ return '<div><a href="'+context["url"]+'" >'+context.keyword+'</a></span></div>' },
+
+							}
+						});
+
+			</script>
+
+			<!-- 新的搜索框 -->
