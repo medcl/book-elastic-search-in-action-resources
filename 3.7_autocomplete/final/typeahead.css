@@ -1,0 +1,77 @@
+#search_box input{
+    padding: 10px;
+    border: 0px solid;
+}
+
+#search_box .twitter-typeahead input[type=text]:focus {
+    border: none;
+}
+
+#search_box .tt-menu{
+    width: 500px;;
+}
+
+.tt-hint{
+    color: #CCCCCC;
+}
+
+.tt-menu{
+    border-bottom: 1px solid #6badc8;
+}
+
+
+.tt-dataset{
+    background: #FFFFFF;
+}
+
+.tt-selectable{
+    padding:5px 10px ;
+}
+
+.tt-suggestion{
+    border-top: 1px dotted #ebf0f1;
+    border-left: 1px solid #ebf0f1;
+    border-right: 1px solid #ebf0f1;
+}
+
+.tt-cursor{
+    background: #e2f3fa;
+}
+
+.tt-highlight{
+    color: #ff8b70;
+}
+
+.tt-link{
+    font-size:2px;
+}
+.tt-link a{
+    font-size:2px;
+    text-decoration: underline;
+}
+
+.tt-empty{
+    padding:5px 10px ;
+}
+
+.tt-query-not-found{
+    color: #ff606a;
+}
+
+.tt-header{
+    padding:5px 10px ;
+    font-size:8px;
+    width: 100%;
+    background: #d9eaf1;
+    color: #2c3134;
+    display: block;
+}
+
+.tt-footer{
+    width: 100%;
+    background: #d9eaf1;
+    display: block;
+    padding-right: 10px;
+    text-align: right;
+    font-size:8px;
+}
