@@ -1,0 +1,33 @@
+POST _scripts/forum_search_template_v1
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": "{{size}}",
+      "query": {
+        "match": {
+          "{{field}}": "{{query}}"
+        }
+      },
+      "_source": [
+        "title",
+        "id",
+        "uid",
+        "views"
+      ]
+    }
+  }
+}
+
+GET _scripts/my_search_template
+
+GET forum-mysql/_search/template
+{
+  "id": "forum_search_template_v1",
+  "params": {
+    "field": "title",
+    "query": "elasticsearch",
+    "size": 10
+  }
+}
+
