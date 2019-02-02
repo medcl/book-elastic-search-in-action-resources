@@ -1,0 +1,164 @@
+#失败的 Match 查询
+GET forum-mysql/_search
+{
+  "query": {"match": {
+    "title": "elas"
+  }}
+}
+
+
+#Prefix 查询
+GET forum-mysql/_search
+{
+ "query": {
+   "prefix": {
+     "title.keyword": {
+       "value": "elas"
+     }
+   }
+ },"_source": "title" 
+}
+
+#找不到结果
+GET forum-mysql/_search
+{
+ "query": {
+   "prefix": {
+     "title.keyword": {
+       "value": "Elasticsearch SQL"
+     }
+   }
+ },"_source": "title" 
+}
+
+#组合 Match 查询和 Prefix 查询
+GET forum-mysql/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "prefix": {
+            "title.keyword": {
+              "value": "Elasticsearch SQL"
+            }
+          }
+        },{
+          "match": {
+            "title": "Elasticsearch SQL"
+          }
+        }
+      ]
+    }
+  },
+  "_source": "title"
+}
+
+
+#添加权重
+GET forum-mysql/_search
+{
+  "query": {
+    "bool": {
+      "must": [],
+      "should": [
+        {
+          "prefix": {
+            "title.keyword": {
+              "value": "spark",
+              "boost": 10
+            }
+          }
+        },
+        {
+          "match": {
+            "title": "spark"
+          }
+        }
+      ]
+    }
+  },
+  "_source": "title"
+}
+
+
+# 添加 phrase 查询
+GET forum-mysql/_search
+{
+  "size": 5,
+  "query": {
+    "bool": {
+      "must": [],
+      "should": [
+        {
+          "prefix": {
+            "title.keyword": {
+              "value": "elastic 上海",
+              "boost": 10
+            }
+          }
+        },
+        {
+          "match_phrase_prefix": {
+            "title": {
+              "query": "elastic 上海",
+              "boost": 2
+            }
+          }
+        },
+        {
+          "match": {
+            "title": "elastic 上海"
+          }
+        }
+      ]
+    }
+  },
+  "_source": "title"
+}
+
+
+# 更新模板
+POST _scripts/forum_search_template_v1
+{
+  "script": {
+    "lang": "mustache",
+   "source": {
+    "size": "{{size}}",
+   "query": {
+    "bool": {
+      "must": [],
+      "should": [
+        {
+          "prefix": {
+            "{{field}}.keyword": {
+              "value": "{{query}}",
+              "boost": 10
+            }
+          }
+        },
+        {
+          "match_phrase_prefix": {
+            "{{field}}": {
+              "query": "{{query}}",
+              "boost": 2
+            }
+          }
+        },
+        {
+          "match": {
+            "{{field}}": "{{query}}"
+          }
+        }
+      ]
+    }
+  },
+    "_source": [
+      "title",
+      "id",
+      "uid",
+      "views"
+    ]
+  }
+  }
+}
