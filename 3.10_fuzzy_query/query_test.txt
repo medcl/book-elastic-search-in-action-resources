@@ -173,6 +173,32 @@ GET test/_search
   }
 }
 
+#Query String 正则表达式
+GET forum-mysql/_search
+{
+  "query": {
+    "query_string": {
+      "query": "/Elastic Meetup (广州|长沙|深圳)交流会/",
+      "fuzziness": "AUTO",
+      "fuzzy_prefix_length": 2,
+      "fuzzy_max_expansions": 20,
+      "fuzzy_transpositions":true
+    }
+  },"_source": "title"
+}
+
+# 正则表达式查询
+GET forum-mysql/_search
+{
+  "query": {
+    "regexp": {
+      "title.keyword":{
+        "value": "Elastic Meetup (广州|长沙|深圳)交流会"
+      }
+    }
+  },"_source": "title"
+}
+
 # Query String 查询【通配符查询】
 GET test/_search
 {
@@ -239,7 +265,7 @@ POST _scripts/forum_search_template_v1
             },
             {
               "query_string": {
-                "default_field": "{{field}}",
+                "fields": ["{{field}}","{{field}}.keyword^10"], 
                 "query": "{{query}}",
                 "fuzziness": "AUTO",
                 "fuzzy_prefix_length": 2,
