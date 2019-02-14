@@ -1,0 +1,253 @@
+DELETE test
+
+POST test/doc/1
+{
+  "doc":"elastic"
+}
+
+POST test/doc/2
+{
+  "doc":"elastik"
+}
+
+#AUTO 模式
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": "elastix",
+        "fuzziness": "AUTO"
+      }
+    }
+  }
+}
+
+#编辑距离2（修改1字符）
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": "elastim",
+        "fuzziness": "AUTO"
+      }
+    }
+  }
+}
+
+#编辑距离2（多2字符）
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": "elasticop",
+        "fuzziness": "AUTO"
+      }
+    }
+  }
+}
+
+#编辑距离2（少2字符）
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": "elast",
+        "fuzziness": "AUTO"
+      }
+    }
+  }
+}
+
+
+
+#编辑距离100？
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": "elas",
+        "fuzziness": 100
+      }
+    }
+  }
+}
+
+#`elast ic`是否能够匹配？那 `e lastic` 呢
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": "elast ic",
+        "fuzziness": "AUTO"
+      }
+    }
+  }
+}
+
+#不支持位置变换，只允许一次编辑
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": " elsatic",
+        "fuzziness": "1",
+        "fuzzy_transpositions":false
+      }
+    }
+  }
+}
+
+
+#最少前缀匹配个数2，且支持位置变换
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": " elsatic",
+        "fuzziness": "AUTO",
+        "fuzzy_transpositions":true,
+        "prefix_length":2
+      }
+    }
+  }
+}
+
+
+#优化查询
+GET test/_search
+{
+  "query": {
+    "match": {
+      "doc":{
+        "query": " elasti",
+        "fuzziness": "AUTO",
+        "max_expansions":10,
+        "prefix_length":2
+      }
+    }
+  }
+}
+
+#Fuzzy Query
+GET test/_search
+{
+  "query": {
+    "fuzzy": {
+      "doc":{
+        "value": " elsatic",
+        "fuzziness": "AUTO",
+        "transpositions":true
+      }
+    }
+  }
+}
+
+#通配符查询
+GET test/_search
+{
+  "query": {
+    "wildcard": {
+      "doc": {
+        "value": "elasti?"
+      }
+    }
+  }
+}
+
+
+# Query String 查询【正则表达式】
+GET test/_search
+{
+  "query": {
+    "query_string": {
+      "query": "/elasti[ck]+/"
+    }
+  }
+}
+
+# Query String 查询【通配符查询】
+GET test/_search
+{
+  "query": {
+    "query_string": {
+      "query": "elasti*",
+      "allow_leading_wildcard": false
+    }
+  }
+}
+
+# Query String 查询【Fuzzy查询】
+GET test/_search
+{
+  "query": {
+    "query_string": {
+      "default_field": "doc", 
+      "query": " elasti~",
+      "fuzziness": "AUTO",
+      "fuzzy_prefix_length": 2,
+      "fuzzy_max_expansions": 20,
+      "fuzzy_transpositions":true
+    }
+  }
+}
+
+
+# 更新模板
+POST _scripts/forum_search_template_v1
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": "{{size}}",
+      "query": {
+        "bool": {
+          "must": [],
+          "should": [
+            {
+              "prefix": {
+                "{{field}}.keyword": {
+                  "value": "{{query}}",
+                  "boost": 10
+                }
+              }
+            },
+            {
+              "match_phrase_prefix": {
+                "{{field}}": {
+                  "query": "{{query}}",
+                  "boost": 2
+                }
+              }
+            },{
+              "query_string": {
+                "default_field": "{{field}}", 
+                "query": "{{query}}~",
+                "fuzziness": "AUTO",
+                "fuzzy_prefix_length": 2,
+                "fuzzy_max_expansions": 10,
+                "fuzzy_transpositions":true
+              }
+            }
+          ]
+        }
+      },
+      "_source": [
+        "title",
+        "id",
+        "uid",
+        "views"
+      ]
+    }
+  }
+}
+
+
+
