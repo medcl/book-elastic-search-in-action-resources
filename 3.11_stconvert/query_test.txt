@@ -1,0 +1,213 @@
+#查看插件列表
+GET _cat/plugins
+
+#测试分析器
+GET /_analyze
+{
+  "text": ["我爱China。"],
+  "char_filter": "stconvert"
+}
+
+#测试分析器，配置各个组件
+GET /_analyze
+{
+  "tokenizer" : "standard",
+  "filter" : ["lowercase"],
+  "char_filter" : ["stconvert"],
+  "text" : "我愛中國"
+}
+
+
+#删除索引
+DELETE my_index
+
+#创建索引并设置分析器
+PUT /my_index 
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_analyzer": {
+            "tokenizer": "standard",
+            "filter": ["lowercase"],
+            "char_filter": ["tsconvert"]
+        }
+      },
+      "char_filter": {
+        "tsconvert" : {
+            "type" : "stconvert",
+            "delimiter" : "#",
+            "keep_both" : false,
+            "convert_type" : "t2s"
+        }
+      }
+    }
+  }
+}
+
+#测试分析器
+POST /my_index/_analyze
+{
+	"analyzer": "my_analyzer",
+	"text": "我愛中國"
+}
+
+#测试分析器
+POST /my_index/_analyze
+{
+	"analyzer": "my_analyzer",
+	"text": "我愛China。"
+}
+
+
+#创建一个新的社区数据索引
+PUT /forum-mysql-v1
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "standard_ts_analyzer": {
+            "tokenizer": "standard",
+            "filter": ["lowercase"],
+            "char_filter": ["tsconvert"]
+        }
+      },
+      "char_filter": {
+        "tsconvert" : {
+            "type" : "stconvert",
+            "delimiter" : "#",
+            "keep_both" : false,
+            "convert_type" : "t2s"
+        }
+      }
+    }
+  }
+}
+
+
+#获取旧索引的Mapping定义
+GET forum-mysql/_mapping
+
+#为新索引创建新的Mapping
+PUT forum-mysql-v1/doc/_mapping
+{
+  "doc": {
+    "properties": {
+      "addtime": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "category_id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "comments": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "has_attach": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "message": {
+        "type": "text",
+        "analyzer": "standard_ts_analyzer", 
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "title": {
+        "type": "text", 
+        "analyzer": "standard_ts_analyzer", 
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "uid": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "views": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "votes": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}
+
+#查询旧索引
+GET forum-mysql/_search/template
+{
+  "id": "forum_search_template_v1",
+  "params": {
+    "field": "title",
+    "query": "數據讀寫",
+    "size": 10
+  }
+}
+
+#验证新索引
+GET forum-mysql-v1/_search/template
+{
+  "id": "forum_search_template_v1",
+  "params": {
+    "field": "title",
+    "query": "數據讀寫",
+    "size": 10
+  }
+}
+
