@@ -1,0 +1,259 @@
+#测试拼音
+GET /_analyze
+{
+  "text": ["学习"],
+  "analyzer": "pinyin"
+}
+
+#测试拼音
+GET /_analyze
+{
+  "text": ["xuexi"],
+  "analyzer": "pinyin"
+}
+
+#测试拼音
+GET /_analyze
+{
+  "text": ["xx"],
+  "analyzer": "pinyin"
+}
+
+#关闭索引
+POST  forum-mysql-v1/_close
+
+#自定义拼音 Analyzer
+PUT forum-mysql-v1/_settings
+{
+  "index": {
+    "analysis": {
+      "analyzer": {
+        "pinyin_analyzer": {
+          "tokenizer": "my_pinyin"
+        }
+      },
+      "tokenizer": {
+        "my_pinyin": {
+          "type": "pinyin",
+          "keep_first_letter": true,
+          "keep_separate_first_letter": true,
+          "keep_full_pinyin": true,
+          "keep_original": false,
+          "limit_first_letter_length": 16,
+          "lowercase": true
+        }
+      }
+    }
+  }
+}
+
+#开启索引
+POST  forum-mysql-v1/_open
+
+
+#修改 Mapping，新增 Pinyin 字段
+PUT forum-mysql-v1/doc/_mapping
+{
+  "doc": {
+    "properties": {
+      "addtime": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "category_id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "comments": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "has_attach": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "message": {
+        "type": "text",
+        "analyzer": "standard_ts_analyzer", 
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "title": {
+        "type": "text", 
+        "analyzer": "standard_ts_analyzer", 
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+           "pinyin": {
+            "type": "text",
+            "analyzer":"pinyin_analyzer"
+          }
+        }
+      },
+      "uid": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "views": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "votes": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}
+
+
+#原地更新索引
+POST forum-mysql-v1/_update_by_query?conflicts=proceed
+
+
+#拼音查询测试
+GET forum-mysql/_search
+{
+  "query": {"match": {
+    "title.pinyin": "xuexi"
+  }},"_source": "title"
+}
+
+
+
+
+# 创建新查询模板
+POST _scripts/forum_search_template_v2
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": "{{size}}",
+      "query": {
+        "bool": {
+          "must": [],
+          "should": [
+            {
+              "prefix": {
+                "{{field}}.keyword": {
+                  "value": "{{query}}",
+                  "boost": 10
+                }
+              }
+            },
+            {
+              "match_phrase_prefix": {
+                "{{field}}": {
+                  "query": "{{query}}",
+                  "boost": 2
+                }
+              }
+            },
+            {
+              "match": {
+                "{{field}}": {
+                  "query": "{{query}}",
+                  "fuzziness": "AUTO",
+                  "max_expansions": 10,
+                  "prefix_length": 2,
+                  "fuzzy_transpositions": true
+                }
+              }
+            },
+            {
+              "query_string": {
+                "fields": ["{{field}}","{{field}}.keyword^10"], 
+                "query": "{{query}}",
+                "fuzziness": "AUTO",
+                "fuzzy_prefix_length": 2,
+                "fuzzy_max_expansions": 10,
+                "fuzzy_transpositions": true,
+                "allow_leading_wildcard": false
+              }
+            },{"match": {
+              "{{field}}.pinyin": "{{query}}"
+              }}
+          ]
+        }
+      },
+      "_source": [
+        "title",
+        "id",
+        "uid",
+        "views"
+      ]
+    }
+  }
+}
+
+
+#验证新模板
+GET forum-mysql-v1/_search/template
+{
+  "id": "forum_search_template_v2",
+  "params": {
+    "field": "title",
+    "query": "xuexi",
+    "size": 10
+  }
+}
+GET forum-mysql-v2/_search/template
+{
+  "id": "forum_search_template_v2",
+  "params": {
+    "field": "title",
+    "query": "学xi",
+    "size": 10
+  }
+}
+

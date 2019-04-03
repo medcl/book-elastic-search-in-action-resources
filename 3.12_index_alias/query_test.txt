@@ -1,0 +1,16 @@
+#创建别名
+POST /_aliases
+{
+    "actions" : [
+        { "add" : { "index" : "forum-mysql-v1", "alias" : "forum-mysql" } }
+    ]
+}
+
+#替换别名
+POST /_aliases
+{
+    "actions" : [
+        { "add" : { "index" : "forum-mysql-v2", "alias" : "forum-mysql" } },
+         { "remove" : { "index" : "forum-mysql-v1", "alias" : "forum-mysql" } }
+    ]
+}
